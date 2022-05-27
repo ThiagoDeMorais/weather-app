@@ -1,0 +1,16 @@
+body {
+  background: rgb(17, 46, 116);
+}
+
+.container {
+  max-width: 400px;
+}
+
+h1 {
+  font-size: 2.2rem;
+}
+
+.information-container{
+  background-color: rgb(34, 86, 134);
+  color: rgb(253, 252, 252);
+}
