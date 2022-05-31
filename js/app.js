@@ -1,21 +1,22 @@
 const cityForm = document.querySelector('[data-js="change-location"]');
-const cityName = document.querySelector('[data-js="city-name"]');
-const cityWeather = document.querySelector('[data-js="city-weather"]');
-const cityTemperature = document.querySelector('[data-js="city-temperature"]');
+const cityNameContainer = document.querySelector('[data-js="city-name"]');
+const cityWeatherContainer = document.querySelector('[data-js="city-weather"]');
+const cityTemperatureContainer = document.querySelector('[data-js="city-temperature"]');
 const cityCard = document.querySelector('[data-js="city-card"]');
 const timeIMG = document.querySelector('[data-js="time"]');
 const timeIconContainer = document.querySelector('[data-js="time-icon"]');
 
-const showCityCard = (containsDNoneClass) => {
-  if (containsDNoneClass) {
-    cityCard.classList.remove("d-none");
-  }
-};
+const getWeatherData = async (cityName) => {
+  const cityData = await getCityData(cityName);
 
-const getAllData = async (cityName) => {
-  const [{ Key, LocalizedName }] = await getCityData(cityName);
+  if(!cityData.length){
+    alert('Cidade não encontrada')
+    return
+  }
+
+  const [{Key, LocalizedName}] = cityData
   const [{ IsDayTime, Temperature, WeatherIcon, WeatherText }] =
-    await getCityWheather(Key);
+    await getCityWeather(Key);
   return {
     LocalizedName,
     IsDayTime,
@@ -25,28 +26,23 @@ const getAllData = async (cityName) => {
   };
 };
 
-const insertCityDataInToDOM = ({ LocalizedName, WeatherText, Temperature }) => {
-  cityName.textContent = LocalizedName;
-  cityWeather.textContent = WeatherText;
-  cityTemperature.textContent = Temperature;
-};
-
-const insertIconsIntoDOM = ({ IsDayTime, WeatherIcon }) => {
-  IsDayTime
-    ? (timeIMG.src = "./src/day.svg")
-    : (timeIMG.src = "./src/night.svg");
-
-  timeIconContainer.innerHTML = `<img src="./src/icons/${WeatherIcon}.svg"</img>`;
-};
-
-const executeChainOfFunctions = async (event) => {
+const showCityWeather = async (event) => {
   event.preventDefault();
-  const inputValue = event.target.city.value;
+  const cityName = event.target.city.value;
+  const weatherData = await getWeatherData(cityName);
+  event.target.reset();
 
-  insertCityDataInToDOM(await getAllData(inputValue));
-  insertIconsIntoDOM(await getAllData(inputValue));
-  showCityCard(cityCard.classList.contains("d-none"));
-  event.target.reset()
-}
+  if(!weatherData){
+    return
+  }
 
-cityForm.addEventListener("submit", executeChainOfFunctions );
+  cityNameContainer.textContent = weatherData.LocalizedName;
+  cityWeatherContainer.textContent = weatherData.WeatherText;
+  cityTemperatureContainer.textContent = weatherData.Temperature;
+  timeIMG.src = weatherData.IsDayTime ? "./src/day.svg" : "./src/night.svg";
+  timeIconContainer.innerHTML = `<img src="./src/icons/${weatherData.WeatherIcon}.svg"</img>`;
+
+  cityCard.classList.remove("d-none");
+};
+
+cityForm.addEventListener("submit", showCityWeather);
