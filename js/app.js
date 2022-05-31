@@ -46,6 +46,7 @@ const executeChainOfFunctions = async (event) => {
   insertCityDataInToDOM(await getAllData(inputValue));
   insertIconsIntoDOM(await getAllData(inputValue));
   showCityCard(cityCard.classList.contains("d-none"));
+  event.target.reset()
 }
 
 cityForm.addEventListener("submit", executeChainOfFunctions );
